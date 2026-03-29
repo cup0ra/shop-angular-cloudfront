@@ -3,12 +3,17 @@ import {
   Component,
   computed,
   inject,
+  signal,
 } from '@angular/core';
-import { UntypedFormBuilder, Validators } from '@angular/forms';
+import { form, required } from '@angular/forms/signals';
 import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
 import { CheckoutService } from './checkout.service';
 import { CartService } from './cart.service';
-import { CartShippingFormComponent } from './cart-shipping-form/cart-shipping-form.component';
+import {
+  CartShippingFormComponent,
+  ShippingForm,
+  ShippingModel,
+} from './cart-shipping-form/cart-shipping-form.component';
 import { MatButton } from '@angular/material/button';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { OrderSummaryComponent } from './order-summary/order-summary.component';
@@ -19,7 +24,6 @@ import {
   MatStepperPrevious,
 } from '@angular/material/stepper';
 import { MatCard, MatCardContent, MatCardTitle } from '@angular/material/card';
-import { AsyncPipe } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
@@ -32,7 +36,6 @@ import { toSignal } from '@angular/core/rxjs-interop';
       useValue: { displayDefaultIndicatorType: false },
     },
   ],
-  standalone: true,
   imports: [
     MatCard,
     MatCardTitle,
@@ -45,12 +48,10 @@ import { toSignal } from '@angular/core/rxjs-interop';
     MatStepperNext,
     CartShippingFormComponent,
     MatStepperPrevious,
-    AsyncPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CartComponent {
-  private readonly fb = inject(UntypedFormBuilder);
   private readonly checkoutService = inject(CheckoutService);
   private readonly cartService = inject(CartService);
 
@@ -68,24 +69,30 @@ export class CartComponent {
     return this.cartService.totalInCart() > 0;
   });
 
-  shippingInfo = this.fb.group({
-    lastName: ['', Validators.required],
-    firstName: ['', Validators.required],
-    address: ['', Validators.required],
+  shippingModel = signal<ShippingModel>({
+    address: '',
     comment: '',
+    firstName: '',
+    lastName: '',
+  });
+
+  shippingInfo: ShippingForm = form(this.shippingModel, (path) => {
+    required(path.firstName, { message: 'First name is required!' });
+    required(path.lastName, { message: 'Last name is required!' });
+    required(path.address, { message: 'Shipping address is required!' });
   });
 
   get fullName(): string {
-    const { firstName, lastName } = this.shippingInfo.value;
+    const { firstName, lastName } = this.shippingModel();
     return `${firstName} ${lastName}`;
   }
 
   get address(): string {
-    return this.shippingInfo.value.address;
+    return this.shippingModel().address;
   }
 
   get comment(): string {
-    return this.shippingInfo.value.comment;
+    return this.shippingModel().comment;
   }
 
   add(id: string): void {

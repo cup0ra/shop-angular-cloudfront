@@ -1,20 +1,22 @@
-import {Injectable} from '@angular/core';
+import { Injectable } from '@angular/core';
 
-import {EMPTY, Observable, of} from 'rxjs';
-import {map} from 'rxjs/operators';
+import { EMPTY, Observable, of } from 'rxjs';
+import { map } from 'rxjs/operators';
 
-import {Product} from './product.interface';
+import { Product } from './product.interface';
 
-import {ApiService} from '../core/api.service';
+import { ApiService } from '../core/api.service';
+
+type ProductPayload = Omit<Product, 'id'>;
 
 @Injectable({
   providedIn: 'root',
 })
 export class ProductsService extends ApiService {
-  createNewProduct(product: Product): Observable<Product> {
+  createNewProduct(product: ProductPayload): Observable<Product> {
     if (!this.endpointEnabled('bff')) {
       console.warn(
-        'Endpoint "bff" is disabled. To enable change your environment.ts config'
+        'Endpoint "bff" is disabled. To enable change your environment.ts config',
       );
       return EMPTY;
     }
@@ -23,10 +25,10 @@ export class ProductsService extends ApiService {
     return this.http.post<Product>(url, product);
   }
 
-  editProduct(id: string, changedProduct: Product): Observable<Product> {
+  editProduct(id: string, changedProduct: ProductPayload): Observable<Product> {
     if (!this.endpointEnabled('bff')) {
       console.warn(
-        'Endpoint "bff" is disabled. To enable change your environment.ts config'
+        'Endpoint "bff" is disabled. To enable change your environment.ts config',
       );
       return EMPTY;
     }
@@ -38,14 +40,14 @@ export class ProductsService extends ApiService {
   getProductById(id: string): Observable<Product | null> {
     if (!this.endpointEnabled('bff')) {
       console.warn(
-        'Endpoint "bff" is disabled. To enable change your environment.ts config'
+        'Endpoint "bff" is disabled. To enable change your environment.ts config',
       );
       return this.http
         .get<Product[]>('/assets/products.json')
         .pipe(
           map(
-            (products) => products.find((product) => product.id === id) || null
-          )
+            (products) => products.find((product) => product.id === id) || null,
+          ),
         );
     }
 
@@ -58,7 +60,7 @@ export class ProductsService extends ApiService {
   getProducts(): Observable<Product[]> {
     if (!this.endpointEnabled('bff')) {
       console.warn(
-        'Endpoint "bff" is disabled. To enable change your environment.ts config'
+        'Endpoint "bff" is disabled. To enable change your environment.ts config',
       );
       return this.http.get<Product[]>('/assets/products.json');
     }
@@ -73,7 +75,7 @@ export class ProductsService extends ApiService {
     }
 
     return this.getProducts().pipe(
-      map((products) => products.filter((product) => ids.includes(product.id)))
+      map((products) => products.filter((product) => ids.includes(product.id))),
     );
   }
 }

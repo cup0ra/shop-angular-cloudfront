@@ -15,6 +15,16 @@ describe('CartProductItemComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ProductItemCheckoutComponent);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('product', {
+      count: 2,
+      description: 'Test description',
+      id: 'product-1',
+      image: 'image.png',
+      orderedCount: 1,
+      price: 10,
+      title: 'Test product',
+      totalPrice: 10,
+    });
     fixture.detectChanges();
   });
 

@@ -1,6 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { of } from 'rxjs';
 
 import { CartComponent } from './cart.component';
+import { CartService } from './cart.service';
+import { CheckoutService } from './checkout.service';
 
 describe('CartComponent', () => {
   let component: CartComponent;
@@ -9,6 +12,23 @@ describe('CartComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [CartComponent],
+      providers: [
+        {
+          provide: CartService,
+          useValue: {
+            addItem: () => {},
+            cart: () => ({}),
+            removeItem: () => {},
+            totalInCart: () => 0,
+          },
+        },
+        {
+          provide: CheckoutService,
+          useValue: {
+            getProductsForCheckout: () => of([]),
+          },
+        },
+      ],
     }).compileComponents();
   });
 

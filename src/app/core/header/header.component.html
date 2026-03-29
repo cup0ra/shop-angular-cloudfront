@@ -14,7 +14,10 @@
 
   <!-- Cart btn -->
   <button routerLink="cart" matTooltip="Go to cart" mat-icon-button>
-    <mat-icon [matBadge]="totalInCart()" matBadgeColor="accent"
+    <mat-icon
+      aria-hidden="false"
+      [matBadge]="totalInCart()"
+      matBadgeColor="accent"
       >shopping_cart</mat-icon
     >
   </button>

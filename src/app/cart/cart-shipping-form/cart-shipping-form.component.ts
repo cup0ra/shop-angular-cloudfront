@@ -1,18 +1,34 @@
 import { Component, input, output } from '@angular/core';
-import { ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
+import { FieldTree, FormField } from '@angular/forms/signals';
 
 import { MatInput } from '@angular/material/input';
 import { MatError, MatFormField } from '@angular/material/form-field';
+
+export interface ShippingModel {
+  firstName: string;
+  lastName: string;
+  address: string;
+  comment: string;
+}
+
+export type ShippingForm = FieldTree<ShippingModel>;
 
 @Component({
   selector: 'app-cart-shipping-form',
   templateUrl: './cart-shipping-form.component.html',
   styleUrls: ['./cart-shipping-form.component.scss'],
-  standalone: true,
-  imports: [ReactiveFormsModule, MatFormField, MatInput, MatError],
+  imports: [FormField, MatFormField, MatInput, MatError],
 })
 export class CartShippingFormComponent {
-  shippingInfo = input.required<UntypedFormGroup>();
+  shippingInfo = input.required<ShippingForm>();
 
   nextStep = output();
+
+  onSubmit(event: Event): void {
+    event.preventDefault();
+
+    if (this.shippingInfo()().valid()) {
+      this.nextStep.emit();
+    }
+  }
 }

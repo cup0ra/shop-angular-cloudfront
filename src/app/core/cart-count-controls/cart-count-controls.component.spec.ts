@@ -15,6 +15,9 @@ describe('CartCountControlsComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(CartCountControlsComponent);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('available', 10);
+    fixture.componentRef.setInput('count', 1);
+    fixture.componentRef.setInput('productName', 'Test product');
     fixture.detectChanges();
   });
 
