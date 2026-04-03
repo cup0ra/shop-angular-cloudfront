@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { CartService } from '../../cart/cart.service';
-import { AsyncPipe } from '@angular/common';
 import { MatBadge } from '@angular/material/badge';
 import { MatIcon } from '@angular/material/icon';
 import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
@@ -13,7 +12,6 @@ import { MatToolbar } from '@angular/material/toolbar';
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
-  standalone: true,
   imports: [
     MatToolbar,
     RouterLink,
@@ -24,7 +22,6 @@ import { MatToolbar } from '@angular/material/toolbar';
     MatBadge,
     MatMenu,
     MatMenuItem,
-    AsyncPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

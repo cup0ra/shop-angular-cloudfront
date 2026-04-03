@@ -8,17 +8,17 @@ import {
   signal,
 } from '@angular/core';
 import {
-  AbstractControl,
-  ReactiveFormsModule,
-  UntypedFormBuilder,
-  Validators,
-} from '@angular/forms';
+  FieldTree,
+  form,
+  FormField,
+  min,
+  required,
+} from '@angular/forms/signals';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { filter } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 
-import { Product } from '../../products/product.interface';
 import { ProductsService } from '../../products/products.service';
 import { NotificationService } from '../../core/notification.service';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
@@ -33,17 +33,25 @@ import {
 } from '@angular/material/card';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
+interface EditProductModel {
+  count: number | null;
+  description: string;
+  price: number | null;
+  title: string;
+}
+
+type EditProductForm = FieldTree<EditProductModel>;
+
 @Component({
   selector: 'app-edit-product',
   templateUrl: './edit-product.component.html',
   styleUrls: ['./edit-product.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [
     MatCard,
     MatCardTitle,
     MatCardContent,
-    ReactiveFormsModule,
+    FormField,
     MatFormField,
     MatLabel,
     MatInput,
@@ -56,43 +64,34 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 })
 export class EditProductComponent implements OnInit {
   #destroyRef = inject(DestroyRef);
+  #activatedRoute = inject(ActivatedRoute);
+  #notificationService = inject(NotificationService);
+  #productsService = inject(ProductsService);
+  #router = inject(Router);
 
   productId = input<string>();
 
-  form = this.fb.group({
-    title: ['', Validators.required],
-    description: ['', Validators.required],
-    price: ['', Validators.required],
-    count: ['', Validators.required],
+  model = signal<EditProductModel>({
+    count: null,
+    description: '',
+    price: null,
+    title: '',
+  });
+
+  form: EditProductForm = form(this.model, (path) => {
+    required(path.title, { message: 'Product title is required' });
+    required(path.description, {
+      message: 'Product description is required',
+    });
+    required(path.price, { message: 'Product price is required' });
+    required(path.count, { message: 'Product count is required' });
+    min(path.price, 0);
+    min(path.count, 0);
   });
 
   requestInProgress = false;
 
   loaded = signal(false);
-
-  constructor(
-    private readonly activatedRoute: ActivatedRoute,
-    private readonly fb: UntypedFormBuilder,
-    private readonly notificationService: NotificationService,
-    private readonly productsService: ProductsService,
-    private readonly router: Router,
-  ) {}
-
-  get countCtrl(): AbstractControl {
-    return this.form.get('count') as AbstractControl;
-  }
-
-  get descriptionCtrl(): AbstractControl {
-    return this.form.get('description') as AbstractControl;
-  }
-
-  get priceCtrl(): AbstractControl {
-    return this.form.get('price') as AbstractControl;
-  }
-
-  get titleCtrl(): AbstractControl {
-    return this.form.get('title') as AbstractControl;
-  }
 
   ngOnInit(): void {
     const productId = this.productId();
@@ -102,7 +101,7 @@ export class EditProductComponent implements OnInit {
       return;
     }
 
-    this.productsService
+    this.#productsService
       .getProductById(productId)
       .pipe(
         finalize(() => this.loaded.set(true)),
@@ -110,32 +109,48 @@ export class EditProductComponent implements OnInit {
         takeUntilDestroyed(this.#destroyRef),
       )
       .subscribe((product) => {
-        this.form.patchValue(product);
+        this.model.set({
+          count: product.count,
+          description: product.description,
+          price: product.price,
+          title: product.title,
+        });
       });
   }
 
   editProduct(): void {
-    const product: Product = this.form.value;
-
-    if (!product) {
+    if (this.form().invalid()) {
       return;
     }
+
+    const { count, description, price, title } = this.model();
+
+    if (count === null || price === null) {
+      return;
+    }
+
+    const product = {
+      count,
+      description,
+      price,
+      title,
+    };
 
     const productId = this.productId();
 
     const observable = productId
-      ? this.productsService.editProduct(productId, product)
-      : this.productsService.createNewProduct(product);
+      ? this.#productsService.editProduct(productId, product)
+      : this.#productsService.createNewProduct(product);
 
     this.requestInProgress = true;
 
     observable.subscribe({
       next: () =>
-        this.router.navigate(['../'], { relativeTo: this.activatedRoute }),
+        this.#router.navigate(['../'], { relativeTo: this.#activatedRoute }),
       error: (error: unknown) => {
         console.warn(error);
         this.requestInProgress = false;
-        this.notificationService.showError(
+        this.#notificationService.showError(
           `Failed to ${this.productId() ? 'edit' : 'create'} product`,
         );
       },

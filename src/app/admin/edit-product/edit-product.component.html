@@ -5,13 +5,15 @@
     </h1>
 
     <mat-card-content>
-      <form class="row" [formGroup]="form">
+      <form class="row">
         <div class="col-12">
           <mat-form-field class="w-100">
             <mat-label>Title</mat-label>
-            <input matInput formControlName="title" />
-            @if (titleCtrl.touched && titleCtrl.hasError("required")) {
-              <mat-error> Product title is required </mat-error>
+            <input matInput [formField]="form.title" />
+            @if (form.title().touched() && form.title().invalid()) {
+              @for (error of form.title().errors(); track error) {
+                <mat-error>{{ error.message }}</mat-error>
+              }
             }
           </mat-form-field>
         </div>
@@ -19,11 +21,11 @@
         <div class="col-12">
           <mat-form-field class="w-100">
             <mat-label>Description</mat-label>
-            <textarea matInput formControlName="description"></textarea>
-            @if (
-              descriptionCtrl.touched && descriptionCtrl.hasError("required")
-            ) {
-              <mat-error> Product description is required </mat-error>
+            <textarea matInput [formField]="form.description"></textarea>
+            @if (form.description().touched() && form.description().invalid()) {
+              @for (error of form.description().errors(); track error) {
+                <mat-error>{{ error.message }}</mat-error>
+              }
             }
           </mat-form-field>
         </div>
@@ -31,9 +33,11 @@
         <div class="col col-md-6">
           <mat-form-field class="w-100">
             <mat-label>Price ($)</mat-label>
-            <input type="number" matInput formControlName="price" />
-            @if (priceCtrl.touched && priceCtrl.hasError("required")) {
-              <mat-error> Product price is required </mat-error>
+            <input type="number" matInput [formField]="form.price" />
+            @if (form.price().touched() && form.price().invalid()) {
+              @for (error of form.price().errors(); track error) {
+                <mat-error>{{ error.message }}</mat-error>
+              }
             }
           </mat-form-field>
         </div>
@@ -41,9 +45,11 @@
         <div class="col col-md-6">
           <mat-form-field class="w-100">
             <mat-label>Count</mat-label>
-            <input type="number" matInput formControlName="count" />
-            @if (countCtrl.touched && countCtrl.hasError("required")) {
-              <mat-error> Product count is required </mat-error>
+            <input type="number" matInput [formField]="form.count" />
+            @if (form.count().touched() && form.count().invalid()) {
+              @for (error of form.count().errors(); track error) {
+                <mat-error>{{ error.message }}</mat-error>
+              }
             }
           </mat-form-field>
         </div>
@@ -58,7 +64,7 @@
         class="text-uppercase"
         color="primary"
         mat-flat-button
-        [disabled]="form.invalid || requestInProgress"
+        [disabled]="form().invalid() || requestInProgress"
         (click)="editProduct()"
       >
         save product

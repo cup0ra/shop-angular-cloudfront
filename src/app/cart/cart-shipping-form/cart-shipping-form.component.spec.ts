@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { form } from '@angular/forms/signals';
+import { signal } from '@angular/core';
 
 import { CartShippingFormComponent } from './cart-shipping-form.component';
 
@@ -15,6 +17,19 @@ describe('CartShippingFormComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(CartShippingFormComponent);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput(
+      'shippingInfo',
+      TestBed.runInInjectionContext(() =>
+        form(
+          signal({
+            address: '',
+            comment: '',
+            firstName: '',
+            lastName: '',
+          }),
+        ),
+      ),
+    );
     fixture.detectChanges();
   });
 

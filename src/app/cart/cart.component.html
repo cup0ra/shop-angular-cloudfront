@@ -40,7 +40,10 @@
           </mat-step>
 
           <!-- Shipping address STEP -->
-          <mat-step label="Shipping address" [stepControl]="shippingInfo">
+          <mat-step
+            label="Shipping address"
+            [completed]="shippingInfo().valid()"
+          >
             <h2>Shipping address</h2>
 
             <app-cart-shipping-form
@@ -56,6 +59,7 @@
                 color="primary"
                 class="text-uppercase"
                 mat-flat-button
+                [disabled]="shippingInfo().invalid()"
                 matStepperNext
               >
                 next

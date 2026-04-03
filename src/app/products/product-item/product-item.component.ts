@@ -15,7 +15,7 @@ import { CartCountControlsComponent } from '../../core/cart-count-controls/cart-
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatIconButton } from '@angular/material/button';
-import { AsyncPipe, CurrencyPipe, DecimalPipe } from '@angular/common';
+import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import {
   MatCard,
   MatCardActions,
@@ -29,7 +29,6 @@ import {
   selector: 'app-product-item',
   templateUrl: './product-item.component.html',
   styleUrls: ['./product-item.component.scss'],
-  standalone: true,
   imports: [
     MatCard,
     MatCardImage,
@@ -41,7 +40,6 @@ import {
     MatTooltip,
     MatIcon,
     CartCountControlsComponent,
-    AsyncPipe,
     DecimalPipe,
     CurrencyPipe,
   ],
