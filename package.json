@@ -9,7 +9,11 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "prepare": "husky",
-    "lint:format": "npx --no-install lint-staged && npx --no-install pretty-quick --staged"
+    "lint:format": "npx --no-install lint-staged && npx --no-install pretty-quick --staged",
+    "cdk:bootstrap": "cd ./infrastructure && cdk bootstrap",
+    "cdk:synth": "npm run build && cd ./infrastructure && cdk synth",
+    "cdk:deploy": "npm run cdk:synth && cd ./infrastructure && cdk deploy",
+    "cdk:destroy": "cd ./infrastructure && cdk destroy"
   },
   "private": true,
   "dependencies": {

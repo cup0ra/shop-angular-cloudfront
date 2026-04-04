@@ -30,6 +30,25 @@ Follow the steps:
 - npm i
 - ng serve
 
+## CDK deployment
+
+The deployment stack targets the AWS account and region configured in your current AWS CLI session.
+
+Before the first deployment in a given AWS account and region, bootstrap the CDK environment:
+
+- `npm run cdk:bootstrap`
+
+Then deploy the app and infrastructure:
+
+- `npm run cdk:deploy`
+
+If you need a specific account, region, or profile, set those in your AWS CLI environment before running the commands. For example:
+
+- `AWS_PROFILE=my-profile CDK_DEFAULT_REGION=us-east-1 npm run cdk:bootstrap`
+- `AWS_PROFILE=my-profile CDK_DEFAULT_REGION=us-east-1 npm run cdk:deploy`
+
+If CDK prints a warning that it could not assume the bootstrap deploy role but the credentials are for the correct account, it will continue with your current credentials. That warning is not the blocking error. The blocking error is the missing bootstrap resources.
+
 ## Troubleshooting
 
 ### Cannot commit
