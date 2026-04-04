@@ -18,9 +18,14 @@
     "noFallthroughCasesInSwitch": false,
     "inlineSourceMap": true,
     "inlineSources": true,
+    "isolatedModules": true,
     "experimentalDecorators": true,
     "strictPropertyInitialization": false,
     "skipLibCheck": true,
+    "types": [
+      "node",
+      "jest"
+    ],
     "typeRoots": [
       "./node_modules/@types"
     ]

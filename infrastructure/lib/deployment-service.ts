@@ -6,9 +6,10 @@ import {
   CfnOutput,
   RemovalPolicy
 } from 'aws-cdk-lib';
+import path from 'node:path';
 import { Construct } from 'constructs';
 
-const path = 'resources/build/browser';
+const buildPath = path.resolve(__dirname, '../resources/build/browser');
 
 export class DeploymentService extends Construct {
   constructor(scope: Construct, id: string) {
@@ -32,7 +33,12 @@ export class DeploymentService extends Construct {
             aws_cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
         },
         defaultRootObject: 'index.html',
-        errorResponses: [
+          errorResponses: [
+          {
+            httpStatus: 403,
+            responseHttpStatus: 200,
+            responsePagePath: '/index.html',
+          },
           {
             httpStatus: 404,
             responseHttpStatus: 200,
@@ -43,7 +49,7 @@ export class DeploymentService extends Construct {
     );
 
     new aws_s3_deployment.BucketDeployment(this, 'BucketDeployment', {
-      sources: [aws_s3_deployment.Source.asset(path)],
+      sources: [aws_s3_deployment.Source.asset(buildPath)],
       destinationBucket: hostingBucket,
       distribution,
       distributionPaths: ['/*'],
