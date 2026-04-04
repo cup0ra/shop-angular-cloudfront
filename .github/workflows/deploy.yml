@@ -1,4 +1,4 @@
-name: Deploy Angular to AWS
+name: Deploy Angular with CDK
 
 on:
   push:
@@ -11,8 +11,7 @@ permissions:
 
 env:
   AWS_REGION: us-east-1
-  S3_BUCKET: angular-shop-cf-cup0ra
-  DISTRIBUTION_ID: E1IQP91U5AWZGD
+  STACK_NAME: DeployWebAppStack
 
 jobs:
   deploy:
@@ -25,14 +24,17 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
-      - name: Install dependencies
+      - name: Install root dependencies
         run: npm ci
 
-      - name: Build app
-        run: npm run build
+      - name: Build Angular app
+        run: npm run build -- --configuration production
+
+      - name: Verify build output
+        run: ls -la infrastructure/resources/build/browser
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -40,8 +42,14 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
 
-      - name: Upload files to S3
-        run: aws s3 sync infrastructure/resources/build/browser s3://${{ env.S3_BUCKET }} --delete
+      - name: Install CDK dependencies
+        working-directory: infrastructure
+        run: npm ci
 
-      - name: Invalidate CloudFront cache
-        run: aws cloudfront create-invalidation --distribution-id ${{ env.DISTRIBUTION_ID }} --paths "/*"
+      - name: CDK synth
+        working-directory: infrastructure
+        run: npx cdk synth
+
+      - name: CDK deploy
+        working-directory: infrastructure
+        run: npx cdk deploy ${{ env.STACK_NAME }} --require-approval never
