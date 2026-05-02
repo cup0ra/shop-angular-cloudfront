@@ -32,6 +32,10 @@ Follow the steps:
 
 ## CDK deployment
 
+Current deployed app URL:
+
+- https://dzpenjz7rcmzz.cloudfront.net/
+
 The deployment stack targets the AWS account and region configured in your current AWS CLI session.
 
 Before the first deployment in a given AWS account and region, bootstrap the CDK environment:
