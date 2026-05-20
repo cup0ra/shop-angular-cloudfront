@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import {
   HttpEvent,
   HttpHandler,
+  HttpErrorResponse,
   HttpInterceptor,
   HttpRequest,
 } from '@angular/common/http';
@@ -19,7 +20,23 @@ export class ErrorPrintInterceptor implements HttpInterceptor {
   ): Observable<HttpEvent<unknown>> {
     return next.handle(request).pipe(
       tap({
-        error: () => {
+        error: (error: unknown) => {
+          if (error instanceof HttpErrorResponse) {
+            if (error.status === 401) {
+              this.#notificationService.showError(
+                'Unauthorized request. Please sign in and try again.',
+              );
+              return;
+            }
+
+            if (error.status === 403) {
+              
+              this.#notificationService.showError(
+                'Access denied. You do not have permission to perform this action.',
+              );
+              return;
+            }
+          }
           const url = new URL(request.url);
 
           this.#notificationService.showError(
